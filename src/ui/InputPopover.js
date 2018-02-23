@@ -11,7 +11,7 @@ import styles from './InputPopover.css';
 type Props = {
   className?: string;
   onCancel: () => any;
-  onSubmit: (value: string) => any;
+  onSubmit: (value: string, openInNewTab: boolean) => any;
 };
 
 export default class InputPopover extends Component {
@@ -21,6 +21,7 @@ export default class InputPopover extends Component {
   constructor() {
     super(...arguments);
     autobind(this);
+    this.openInNewTab = false;
   }
 
   componentDidMount() {
@@ -39,6 +40,9 @@ export default class InputPopover extends Component {
   render() {
     let {props} = this;
     let className = cx(props.className, styles.root);
+
+    // If it has a url already, show that.
+    let url = (props.data && props.data.url) ? props.data.url : '';
     return (
       <div className={className}>
         <div className={styles.inner}>
@@ -46,6 +50,7 @@ export default class InputPopover extends Component {
             ref={this._setInputRef}
             type="text"
             placeholder="https://example.com/"
+            defaultValue={url}
             className={styles.input}
             onKeyPress={this._onInputKeyPress}
           />
@@ -62,12 +67,27 @@ export default class InputPopover extends Component {
             />
           </ButtonGroup>
         </div>
+        <div className={styles.inner}>
+          <label className="radio-item">
+            <input
+              type="checkbox"
+              onChange={this._setNewTabRef}
+              checked={this._newTabRef}
+            />
+            <span> Open in New Tab </span>
+          </label>
+        </div>
       </div>
     );
   }
 
   _setInputRef(inputElement: Object) {
     this._inputRef = inputElement;
+  }
+
+  _setNewTabRef(inputElement: Object) {
+    this.openInNewTab = !this.openInNewTab;
+    this._newTabRef = inputElement;
   }
 
   _onInputKeyPress(event: Object) {
@@ -80,7 +100,7 @@ export default class InputPopover extends Component {
 
   _onSubmit() {
     let value = this._inputRef ? this._inputRef.value : '';
-    this.props.onSubmit(value);
+    this.props.onSubmit(value, this.openInNewTab);
   }
 
   _onDocumentClick(event: Object) {
