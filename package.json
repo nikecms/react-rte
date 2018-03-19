@@ -3,10 +3,7 @@
   "version": "0.15.2",
   "description": "React Rich Text Editor",
   "main": "dist/react-rte.js",
-  "files": [
-    "lib",
-    "dist"
-  ],
+  "files": ["lib", "dist"],
   "scripts": {
     "build": "npm run build-lib && npm run build-dist",
     "build-dist": "rimraf dist && webpack -p",
@@ -64,14 +61,7 @@
     "type": "git",
     "url": "git+https://github.com/sstur/react-rte.git"
   },
-  "keywords": [
-    "reactjs",
-    "draftjs",
-    "contenteditable",
-    "wysiwyg",
-    "richtext",
-    "editor"
-  ],
+  "keywords": ["reactjs", "draftjs", "contenteditable", "wysiwyg", "richtext", "editor"],
   "author": "sstur@me.com",
   "contributors": [
     {
