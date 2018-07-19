@@ -9,6 +9,7 @@ type Props = {
   iconName: string;
   showPopover: boolean,
   data: Object,
+  defaultValue?: string,
   onTogglePopover: Function,
   onSubmit: Function;
 };
@@ -39,6 +40,7 @@ export default class PopoverIconButton extends Component {
       <InputPopover
         // This is part of enabling showing url
         data={this.props.data}
+        defaultValue={this.props.defaultValue}
         onSubmit={this._onSubmit}
         onCancel={this._hidePopover}
       />

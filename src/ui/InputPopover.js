@@ -10,6 +10,7 @@ import styles from './InputPopover.css';
 
 type Props = {
   className?: string;
+  defaultValue?: string;
   onCancel: () => any;
   onSubmit: (value: string, openInNewTab: boolean) => any;
 };
@@ -48,6 +49,7 @@ export default class InputPopover extends Component {
         <div className={styles.inner}>
           <input
             ref={this._setInputRef}
+            // defaultValue={props.defaultValue}
             type="text"
             placeholder="https://example.com/"
             defaultValue={url}
