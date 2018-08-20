@@ -1,6 +1,9 @@
 /* @flow */
-import React, {Component} from 'react';
+import React, {Component, cloneElement} from 'react';
 import ReactDOM from 'react-dom';
+import uuid from 'uuid/v4';
+import {find, mapKeys} from 'lodash';
+import Popper from '@material-ui/core/Popper';
 import IconButton from './IconButton';
 import ButtonGroup from './ButtonGroup';
 import autobind from 'class-autobind';
@@ -10,9 +13,10 @@ import styles from './InputPopover.css';
 
 type Props = {
   className?: string;
-  defaultValue?: string;
+  data?: Object;
   onCancel: () => any;
   onSubmit: (value: string, openInNewTab: boolean) => any;
+  popoverForm: React.Node
 };
 
 export default class InputPopover extends Component {
@@ -23,10 +27,14 @@ export default class InputPopover extends Component {
     super(...arguments);
     autobind(this);
     this.openInNewTab = false;
+
+    this.state = {
+      arrowRef: null,
+    };
   }
 
   componentDidMount() {
-    document.addEventListener('click', this._onDocumentClick);
+    // document.addEventListener('click', this._onDocumentClick);
     document.addEventListener('keydown', this._onDocumentKeydown);
     if (this._inputRef) {
       this._inputRef.focus();
@@ -34,25 +42,68 @@ export default class InputPopover extends Component {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('click', this._onDocumentClick);
+    // document.removeEventListener('click', this._onDocumentClick);
     document.removeEventListener('keydown', this._onDocumentKeydown);
   }
 
-  render() {
-    let {props} = this;
-    let className = cx(props.className, styles.root);
+  handleArrowRef = (node) => {
+    this.setState({
+      arrowRef: node,
+    });
+  };
 
-    // If it has a url already, show that.
-    let url = (props.data && props.data.url) ? props.data.url : '';
-    return (
+  render() {
+    const {props} = this;
+    const className = cx(props.className, styles.root);
+
+    const {
+      onSubmit: formOnSubmit,
+      onCancel: formOnCancel,
+      filterAttributes,
+      linkRefs,
+    } = props.popoverForm.props;
+
+    const {
+      data: {
+        url,
+        target,
+        'data-id': id,
+      },
+    } = props;
+
+    const clonedForm = cloneElement(props.popoverForm, {
+      initialValues: {
+        url,
+        target,
+        id: id || uuid(),
+        destinationType: 'URL',
+        ...(id ? find(linkRefs, ({id: linkId}) => linkId === id) : null),
+      },
+      onSubmit: (data) => {
+
+        const filteredAttributes = mapKeys(
+          filterAttributes ? filterAttributes(data) : data,
+          (_, key) => (['url', 'target'].includes(key) ? key : `data-${key}`),
+        );
+
+        formOnSubmit(data, () => this._onSubmit(filteredAttributes));
+      },
+      onCancel: () => {
+        formOnCancel(props.onCancel());
+      },
+    });
+
+    console.log(this.state.arrowRef);
+
+    const openInNewTab = props.data && props.data.target === '_blank';
+    return !props.popoverForm ? (
       <div className={className}>
         <div className={styles.inner}>
           <input
             ref={this._setInputRef}
-            // defaultValue={props.defaultValue}
             type="text"
             placeholder="https://example.com/"
-            defaultValue={url}
+            defaultValue={url || ''}
             className={styles.input}
             onKeyPress={this._onInputKeyPress}
           />
@@ -73,13 +124,17 @@ export default class InputPopover extends Component {
           <label className="radio-item">
             <input
               type="checkbox"
-              onChange={this._setNewTabRef}
-              checked={this._newTabRef}
+              ref={this._setNewTabRef}
+              defaultChecked={openInNewTab}
             />
             <span> Open in New Tab </span>
           </label>
         </div>
       </div>
+    ) : (<div className={styles.root}>
+      {clonedForm}
+      </div>
+
     );
   }
 
@@ -88,7 +143,6 @@ export default class InputPopover extends Component {
   }
 
   _setNewTabRef(inputElement: Object) {
-    this.openInNewTab = !this.openInNewTab;
     this._newTabRef = inputElement;
   }
 
@@ -100,9 +154,19 @@ export default class InputPopover extends Component {
     }
   }
 
-  _onSubmit() {
-    let value = this._inputRef ? this._inputRef.value : '';
-    this.props.onSubmit(value, this.openInNewTab);
+  _onSubmit(data) {
+    const value = this._inputRef ? this._inputRef.value : '';
+    const openInNewTab = this._newTabRef ? this._newTabRef.checked : false;
+
+    const linkData = data || {
+      url: value, ...(
+        openInNewTab
+          ? {target: '_blank'}
+          : null
+        ),
+    };
+
+    this.props.onSubmit(linkData);
   }
 
   _onDocumentClick(event: Object) {

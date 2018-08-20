@@ -20,7 +20,7 @@ export default class IconButton extends Component {
 
   render() {
     let {props} = this;
-    let {className, iconName, label, children, isActive, ...otherProps} = props;
+    let {buttonRef, className, iconName, label, children, isActive, ...otherProps} = props;
     className = cx(className, {
       [styles.root]: true,
       [styles.isActive]: isActive,
@@ -28,7 +28,7 @@ export default class IconButton extends Component {
     return (
       <ButtonWrap>
         <Button {...otherProps} title={label} className={className}>
-          <span className={styles['icon-' + iconName]} />
+          <span className={styles['icon-' + iconName]} ref={buttonRef} />
           {/* TODO: add text label here with aria-hidden */}
         </Button>
         {children}

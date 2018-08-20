@@ -1,14 +1,15 @@
 .root {
   position: absolute;
   top: calc(100% + 5px);
-  left: 0;
-  width: 260px;
+  right: -220px;
+  width: auto;
   background: none #fdfdfd;
   background: linear-gradient(to bottom, #fdfdfd 0%,#f6f7f8 100%);
   border: 1px solid #999;
   border-radius: 2px;
   box-sizing: border-box;
   padding: 4px;
+  z-index: 3000;
 }
 
 .root:before {
@@ -18,7 +19,7 @@
   width: 0;
   height: 0;
   top: -10px;
-  left: 10px;
+  right: 230px;
   border: 5px solid transparent;
   border-bottom-color: #999;
 }
@@ -30,7 +31,7 @@
   width: 0;
   height: 0;
   top: -9px;
-  left: 10px;
+  right: 230px;
   border: 5px solid transparent;
   border-bottom-color: #fdfdfd;
 }
@@ -57,4 +58,20 @@
   flex: 0 1 auto;
   margin-left: 4px;
   margin-bottom: 0;
+}
+
+.arrow: {
+  position: absolute;
+  font-size: 7;
+  width: 3em;
+  height: 3em;
+}
+
+.arrow:before {
+  content: "";
+  margin: auto;
+  display: block;
+  width: 0;
+  height: 0;
+  border-style: 'solid';
 }

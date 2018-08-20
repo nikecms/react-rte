@@ -197,16 +197,8 @@ export default class EditorToolbar extends Component {
     let isCursorOnLink = (entity != null && entity.type === ENTITY_TYPE.LINK);
     let shouldShowLinkButton = hasSelection || isCursorOnLink;
 
-    // If there is already a url, pass that in.
-    let data = {};
-    if (entity) {
-      let {url} = (entity != null && entity.type === ENTITY_TYPE.LINK) ? entity.getData() : null;
-      if (url) {
-        data = {url};
-      }
-    }
-
-    let defaultValue = (entity && isCursorOnLink) ? entity.getData().url : '';
+    // If there is already data, pass that in.
+    const data = (entity != null && entity.type === ENTITY_TYPE.LINK) ? entity.getData() : {};
 
     /* DO WE STILL NEED data IN ADDITION TO defaultValue? */
     return (
@@ -218,8 +210,8 @@ export default class EditorToolbar extends Component {
           data={data}
           showPopover={this.state.showLinkInput}
           onTogglePopover={this._toggleShowLinkInput}
-          defaultValue={defaultValue}
           onSubmit={this._setLink}
+          popoverForm={this.props.linkForm}
         />
         <IconButton
           {...toolbarConfig.extraProps}
@@ -340,7 +332,7 @@ export default class EditorToolbar extends Component {
     this._focusEditor();
   }
 
-  _setLink(url: string, openInNewTab: boolean) {
+  _setLink(data) {
     let {editorState} = this.props;
     let contentState = editorState.getCurrentContent();
     let selection = editorState.getSelection();
@@ -363,7 +355,8 @@ export default class EditorToolbar extends Component {
 
     this.setState({showLinkInput: false});
     if (canApplyLink) {
-      const data = {url, ...openInNewTab && {target: '_blank '}};
+      // const data = {url, ...openInNewTab && {target: '_blank'}};
+      console.log('_setLink data', data);
       contentState = contentState.createEntity(ENTITY_TYPE.LINK, 'MUTABLE', data);
       let entityKey = contentState.getLastCreatedEntityKey();
 
@@ -377,10 +370,14 @@ export default class EditorToolbar extends Component {
   }
 
   _removeLink() {
-    let {editorState} = this.props;
+    let {editorState, removeLink} = this.props;
     let entity = getEntityAtCursor(editorState);
     if (entity != null) {
-      let {blockKey, startOffset, endOffset} = entity;
+      let {blockKey, entityKey, startOffset, endOffset} = entity;
+      const data = editorState.getCurrentContent().getEntity(entityKey).getData();
+
+      removeLink(data['data-id']);
+
       this.props.onChange(
         clearEntityForRange(editorState, blockKey, startOffset, endOffset)
       );

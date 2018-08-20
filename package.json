@@ -1,9 +1,12 @@
 {
   "name": "react-rte",
-  "version": "0.16.1",
+  "version": "0.16.2",
   "description": "React Rich Text Editor",
   "main": "dist/react-rte.js",
-  "files": ["lib", "dist"],
+  "files": [
+    "lib",
+    "dist"
+  ],
   "scripts": {
     "build": "npm run build-lib && npm run build-dist",
     "build-dist": "rimraf dist && webpack -p",
@@ -16,6 +19,7 @@
     "test-src": "BABEL_ENV=test mocha \"src/**/__tests__/*.js\""
   },
   "dependencies": {
+    "@material-ui/core": "^1.5.0",
     "babel-runtime": "^6.23.0",
     "class-autobind": "^0.1.4",
     "classnames": "^2.2.5",
@@ -25,7 +29,9 @@
     "draft-js-import-html": ">=0.4.0",
     "draft-js-import-markdown": ">=0.3.0",
     "draft-js-utils": ">=0.2.0",
-    "immutable": "^3.8.1"
+    "immutable": "^3.8.1",
+    "lodash": "^4.17.10",
+    "uuid": "^3.3.2"
   },
   "peerDependencies": {
     "react": "0.14.x || 15.x.x || 16.x.x",
@@ -51,7 +57,9 @@
     "flow-bin": "^0.32.0",
     "mocha": "^3.1.2",
     "raw-loader": "^0.5.1",
+    "react": "^16.4.1",
     "react-addons-test-utils": "^15.0.2",
+    "react-dom": "^16.4.1",
     "rimraf": "^2.5.4",
     "style-loader": "^0.18.2",
     "webpack": "^3.4.0",
@@ -61,7 +69,14 @@
     "type": "git",
     "url": "git+https://github.com/sstur/react-rte.git"
   },
-  "keywords": ["reactjs", "draftjs", "contenteditable", "wysiwyg", "richtext", "editor"],
+  "keywords": [
+    "reactjs",
+    "draftjs",
+    "contenteditable",
+    "wysiwyg",
+    "richtext",
+    "editor"
+  ],
   "author": "sstur@me.com",
   "contributors": [
     {
