@@ -3,7 +3,6 @@ import React, {Component, cloneElement} from 'react';
 import ReactDOM from 'react-dom';
 import uuid from 'uuid/v4';
 import {find, mapKeys} from 'lodash';
-import Popper from '@material-ui/core/Popper';
 import IconButton from './IconButton';
 import ButtonGroup from './ButtonGroup';
 import autobind from 'class-autobind';
@@ -73,14 +72,13 @@ export default class InputPopover extends Component {
 
     const clonedForm = cloneElement(props.popoverForm, {
       initialValues: {
-        url,
+        url: url || '',
         target,
         id: id || uuid(),
         destinationType: 'URL',
         ...(id ? find(linkRefs, ({id: linkId}) => linkId === id) : null),
       },
       onSubmit: (data) => {
-
         const filteredAttributes = mapKeys(
           filterAttributes ? filterAttributes(data) : data,
           (_, key) => (['url', 'target'].includes(key) ? key : `data-${key}`),
@@ -92,8 +90,6 @@ export default class InputPopover extends Component {
         formOnCancel(props.onCancel());
       },
     });
-
-    console.log(this.state.arrowRef);
 
     const openInNewTab = props.data && props.data.target === '_blank';
     return !props.popoverForm ? (

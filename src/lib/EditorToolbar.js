@@ -32,6 +32,7 @@ type Props = {
   toolbarConfig: ToolbarConfig;
   customControls: Array<CustomControl>;
   rootStyle?: Object;
+  linkForm?: ReactNode;
 };
 
 type State = {

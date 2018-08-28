@@ -16,7 +16,7 @@ function Link(props: Props) {
   const {url, ...rest} = props.contentState.getEntity(props.entityKey).getData();
   console.log('link decorator data', rest);
   return (
-    <a href={url} {...rest} style={{ color: 'blue' }}>{props.children}</a>
+    <a href={url} {...rest} style={{color: 'blue'}}>{props.children}</a>
   );
 }
 

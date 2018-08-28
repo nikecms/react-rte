@@ -11,6 +11,7 @@ type Props = {
   data: Object,
   onTogglePopover: Function,
   onSubmit: Function;
+  popoverForm: ReactNode;
 };
 
 export default class PopoverIconButton extends Component {
