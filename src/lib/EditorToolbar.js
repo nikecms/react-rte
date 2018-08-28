@@ -33,6 +33,7 @@ type Props = {
   customControls: Array<CustomControl>;
   rootStyle?: Object;
   linkForm?: ReactNode;
+  removeLink?: Function;
 };
 
 type State = {
@@ -356,8 +357,6 @@ export default class EditorToolbar extends Component {
 
     this.setState({showLinkInput: false});
     if (canApplyLink) {
-      // const data = {url, ...openInNewTab && {target: '_blank'}};
-      console.log('_setLink data', data);
       contentState = contentState.createEntity(ENTITY_TYPE.LINK, 'MUTABLE', data);
       let entityKey = contentState.getLastCreatedEntityKey();
 
@@ -375,7 +374,10 @@ export default class EditorToolbar extends Component {
     let entity = getEntityAtCursor(editorState);
     if (entity != null) {
       let {blockKey, entityKey, startOffset, endOffset} = entity;
-      const data = editorState.getCurrentContent().getEntity(entityKey).getData();
+
+      const content = editorState.getCurrentContent();
+      const contentEntity = content ? content.getEntity(entityKey) : null;
+      const data = contentEntity ? contentEntity.getData() : {};
 
       removeLink(data['data-id']);
 
