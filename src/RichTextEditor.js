@@ -102,6 +102,8 @@ export default class RichTextEditor extends Component {
       rootStyle,
       toolbarStyle,
       editorStyle,
+      linkForm,
+      removeLink,
       ...otherProps // eslint-disable-line comma-dangle
     } = this.props;
     let editorState = value.getEditorState();
@@ -128,6 +130,8 @@ export default class RichTextEditor extends Component {
           focusEditor={this._focus}
           toolbarConfig={toolbarConfig}
           customControls={customControls}
+          linkForm={linkForm}
+          removeLink={removeLink}
         />
       );
     }

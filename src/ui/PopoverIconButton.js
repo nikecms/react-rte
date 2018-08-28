@@ -9,9 +9,9 @@ type Props = {
   iconName: string;
   showPopover: boolean,
   data: Object,
-  defaultValue?: string,
   onTogglePopover: Function,
   onSubmit: Function;
+  popoverForm: ReactNode;
 };
 
 export default class PopoverIconButton extends Component {
@@ -20,12 +20,13 @@ export default class PopoverIconButton extends Component {
   constructor() {
     super(...arguments);
     autobind(this);
+    this.buttonRef = React.createRef();
   }
 
   render() {
-    let {onTogglePopover, showPopover, ...props} = this.props; // eslint-disable-line no-unused-vars
+    let {onTogglePopover, showPopover, popoverForm, ...props} = this.props; // eslint-disable-line no-unused-vars
     return (
-      <IconButton {...props} onClick={onTogglePopover}>
+      <IconButton {...props} buttonRef={this.buttonRef} onClick={onTogglePopover}>
         {this._renderPopover()}
       </IconButton>
     );
@@ -40,9 +41,10 @@ export default class PopoverIconButton extends Component {
       <InputPopover
         // This is part of enabling showing url
         data={this.props.data}
-        defaultValue={this.props.defaultValue}
         onSubmit={this._onSubmit}
         onCancel={this._hidePopover}
+        popoverForm={this.props.popoverForm}
+        buttonNode={this.buttonRef.current}
       />
     );
   }
