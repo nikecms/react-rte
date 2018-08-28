@@ -26,14 +26,9 @@ export default class InputPopover extends Component {
     super(...arguments);
     autobind(this);
     this.openInNewTab = false;
-
-    this.state = {
-      arrowRef: null,
-    };
   }
 
   componentDidMount() {
-    // document.addEventListener('click', this._onDocumentClick);
     document.addEventListener('keydown', this._onDocumentKeydown);
     if (this._inputRef) {
       this._inputRef.focus();
@@ -41,36 +36,35 @@ export default class InputPopover extends Component {
   }
 
   componentWillUnmount() {
-    // document.removeEventListener('click', this._onDocumentClick);
     document.removeEventListener('keydown', this._onDocumentKeydown);
   }
 
-  handleArrowRef = (node) => {
-    this.setState({
-      arrowRef: node,
-    });
-  };
-
   render() {
-    const {props} = this;
-    const className = cx(props.className, styles.root);
+    const {
+      className: classNameProp,
+      popoverForm,
+      onCancel,
+      data,
+    } = this.props;
+    const className = cx(classNameProp, styles.root);
+
+    const {
+      url,
+      target,
+      'data-id': id,
+    } = data;
 
     const {
       onSubmit: formOnSubmit,
       onCancel: formOnCancel,
       filterAttributes,
       linkRefs,
-    } = props.popoverForm.props;
+    } = popoverForm.props;
 
-    const {
-      data: {
-        url,
-        target,
-        'data-id': id,
-      },
-    } = props;
-
-    const clonedForm = cloneElement(props.popoverForm, {
+    // The form passed in to the RTE has existing onSubmit and onCancel props,
+    // which are replaced with ones which call the RTE's internal _onSubmit and onCancel prop
+    // as callbacks
+    const clonedForm = cloneElement(popoverForm, {
       initialValues: {
         url: url || '',
         target,
@@ -78,21 +72,21 @@ export default class InputPopover extends Component {
         destinationType: 'URL',
         ...(id ? find(linkRefs, ({id: linkId}) => linkId === id) : null),
       },
-      onSubmit: (data) => {
+      onSubmit: (submitData) => {
         const filteredAttributes = mapKeys(
-          filterAttributes ? filterAttributes(data) : data,
+          filterAttributes ? filterAttributes(submitData) : submitData,
           (_, key) => (['url', 'target'].includes(key) ? key : `data-${key}`),
         );
 
-        formOnSubmit(data, () => this._onSubmit(filteredAttributes));
+        formOnSubmit(submitData, () => this._onSubmit(filteredAttributes));
       },
       onCancel: () => {
-        formOnCancel(props.onCancel());
+        formOnCancel(onCancel());
       },
     });
 
-    const openInNewTab = props.data && props.data.target === '_blank';
-    return !props.popoverForm ? (
+    const openInNewTab = target === '_blank';
+    return !popoverForm ? (
       <div className={className}>
         <div className={styles.inner}>
           <input
@@ -107,7 +101,7 @@ export default class InputPopover extends Component {
             <IconButton
               label="Cancel"
               iconName="cancel"
-              onClick={props.onCancel}
+              onClick={onCancel}
             />
             <IconButton
               label="Submit"
