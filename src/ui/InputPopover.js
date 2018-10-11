@@ -1,7 +1,6 @@
 /* @flow */
 import React, {Component, cloneElement} from 'react';
 import ReactDOM from 'react-dom';
-import uuid from 'uuid/v4';
 import {find, mapKeys} from 'lodash';
 import IconButton from './IconButton';
 import ButtonGroup from './ButtonGroup';
@@ -58,20 +57,14 @@ export default class InputPopover extends Component {
       onSubmit: formOnSubmit,
       onCancel: formOnCancel,
       filterAttributes,
-      linkRefs,
+      getInitialValues,
     } = popoverForm.props;
 
     // The form passed in to the RTE has existing onSubmit and onCancel props,
     // which are replaced with ones which call the RTE's internal _onSubmit and onCancel prop
     // as callbacks
     const clonedForm = cloneElement(popoverForm, {
-      initialValues: {
-        url: url || '',
-        target,
-        id: id || uuid(),
-        destinationType: 'URL',
-        ...(id ? find(linkRefs, ({id: linkId}) => linkId === id) : null),
-      },
+      initialValues: getInitialValues(url, target, id),
       onSubmit: (submitData) => {
         const filteredAttributes = mapKeys(
           filterAttributes ? filterAttributes(submitData) : submitData,
@@ -157,14 +150,6 @@ export default class InputPopover extends Component {
     };
 
     this.props.onSubmit(linkData);
-  }
-
-  _onDocumentClick(event: Object) {
-    let rootNode = ReactDOM.findDOMNode(this);
-    if (!rootNode.contains(event.target)) {
-      // Here we pass the event so the parent can manage focus.
-      this.props.onCancel(event);
-    }
   }
 
   _onDocumentKeydown(event: Object) {
