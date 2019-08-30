@@ -1,6 +1,7 @@
 /* @flow */
 import React, {Component} from 'react';
-import {CompositeDecorator, Editor, EditorState, Modifier, RichUtils, Entity} from 'draft-js';
+import { CompositeDecorator, Editor, EditorState, Modifier, RichUtils, Entity } from 'draft-js';
+import { get } from 'lodash';
 import getDefaultKeyBinding from 'draft-js/lib/getDefaultKeyBinding';
 import changeBlockDepth from './lib/changeBlockDepth';
 import changeBlockType from './lib/changeBlockType';
@@ -122,6 +123,7 @@ export default class RichTextEditor extends Component {
     if (!readOnly) {
       editorToolbar = (
         <EditorToolbar
+          value={value}
           rootStyle={toolbarStyle}
           className={toolbarClassName}
           keyEmitter={this._keyEmitter}

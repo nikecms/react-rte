@@ -1,10 +1,11 @@
 /* @flow */
-import {hasCommandModifier} from 'draft-js/lib/KeyBindingUtil';
-
-import React, {Component} from 'react';
+import { hasCommandModifier } from 'draft-js/lib/KeyBindingUtil';
+import React, { Component } from 'react';
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import ReactDOM from 'react-dom';
-import {EditorState, Entity, EntityDescription, RichUtils, Modifier} from 'draft-js';
-import {ENTITY_TYPE} from 'draft-js-utils';
+import { EditorState, Entity, EntityDescription, RichUtils, Modifier, convertToRaw } from 'draft-js';
+import { ENTITY_TYPE } from 'draft-js-utils';
 import DefaultToolbarConfig from './EditorToolbarConfig';
 import StyleButton from './StyleButton';
 import PopoverIconButton from '../ui/PopoverIconButton';
@@ -19,7 +20,7 @@ import cx from 'classnames';
 import styles from './EditorToolbar.css';
 
 import type EventEmitter from 'events';
-import type {ToolbarConfig, CustomControl} from './EditorToolbarConfig';
+import type { ToolbarConfig, CustomControl } from './EditorToolbarConfig';
 
 type ChangeHandler = (state: EditorState) => any;
 
@@ -39,7 +40,7 @@ type Props = {
 type State = {
   showLinkInput: boolean;
   showImageInput: boolean;
-  customControlState: {[key: string]: string};
+  customControlState: { [key: string]: string };
 };
 
 
@@ -54,6 +55,7 @@ export default class EditorToolbar extends Component {
       showLinkInput: false,
       showImageInput: false,
       customControlState: {},
+      isSpecialCharactersToolbarOpen: false,
     };
   }
 
@@ -68,7 +70,8 @@ export default class EditorToolbar extends Component {
   }
 
   render() {
-    let {className, toolbarConfig, rootStyle} = this.props;
+    let { className, toolbarConfig, rootStyle } = this.props;
+    const { isSpecialCharactersToolbarOpen } = this.state;
     if (toolbarConfig == null) {
       toolbarConfig = DefaultToolbarConfig;
     }
@@ -93,18 +96,25 @@ export default class EditorToolbar extends Component {
         case 'HISTORY_BUTTONS': {
           return this._renderUndoRedo(groupName, toolbarConfig);
         }
+        case 'SPECIAL_CHARACTERS_BUTTONS': {
+          return this._renderSpecialCharactersToggle(groupName, toolbarConfig);
+        }
+        default:
+          break;
       }
     });
+
     return (
       <div className={cx(styles.root, className)} style={rootStyle}>
         {buttonGroups}
+        {isSpecialCharactersToolbarOpen && this._renderSpecialCharactersToolbar()}
         {this._renderCustomControls()}
       </div>
     );
   }
 
   _renderCustomControls() {
-    let {customControls, editorState} = this.props;
+    let { customControls, editorState } = this.props;
     if (customControls == null) {
       return;
     }
@@ -125,8 +135,8 @@ export default class EditorToolbar extends Component {
   }
 
   _setCustomControlState(key: string, value: string) {
-    this.setState(({customControlState}) => ({
-      customControlState: {...customControlState, [key]: value},
+    this.setState(({ customControlState }) => ({
+      customControlState: { ...customControlState, [key]: value },
     }));
   }
 
@@ -134,10 +144,54 @@ export default class EditorToolbar extends Component {
     return this.state.customControlState[key];
   }
 
+  // ▪︎ u25AA
+  // ⎵ u23B5
+  // ⊘ u2298
+  // ↫ u21AB
+  // ↲ u21B2
+  convertDisplayText = text =>
+    text
+      .replace(/⎵/g, '\&nbsp;')
+      .replace(/↲/g, '\&#8232;')
+      .replace(/↫/g, '\&#8203;')
+      .replace(/\s/g, '\u25AA');
+
+  // const convertDisplayText = displayText =>
+  //   displayText
+  //     .replace(/\u23B5/g, '\u00A0') // ⎵ u23B5 > u00A0 Non-Breaking Space
+  //     .replace(/\u21AB/g, '\u200B') // ↫ u21AB > u200B Zero-Width Space
+  //     .replace(/\u21B2/g, '\u000A') // ↲ u21B2 > u000A New Line (end of line)
+  //     .replace(/\u25AA/g, ' '); // ▪︎ u25AA > space
+
+  _toggleSpecialCharactersToolbar = () => {
+    const isOpen = this.state.isSpecialCharactersToolbarOpen;
+    this.setState({ isSpecialCharactersToolbarOpen: !isOpen });
+    let { editorState, value } = this.props;
+    let contentState = editorState.getCurrentContent();
+    let selection = editorState.getSelection();
+    console.log({ value, text: contentState.getBlo`ckMap() });
+    if (contenState.hasText() && isOpen) {
+      let newContentState = Modifier.replaceText(contentState, selection, this.convertDisplayText(value.toString('html')));
+      this.props.onChange(
+        EditorState.push(editorState, newContentState)
+      );
+      this._focusEditor();
+    } else {
+      let newContentState = Modifier.insertText(contentState, selection)
+    }
+  }
+
+  _renderSpecialCharactersToggle = () => {
+    return (
+      <ToggleButton key={1} value="left" onChange={this._toggleSpecialCharactersToolbar}>
+        TLC
+      </ToggleButton>);
+  }
+
   _renderBlockTypeDropdown(name: string, toolbarConfig: ToolbarConfig) {
     let blockType = this._getCurrentBlockType();
     let choices = new Map(
-      (toolbarConfig.BLOCK_TYPE_DROPDOWN || []).map((type) => [type.style, {label: type.label, className: type.className}])
+      (toolbarConfig.BLOCK_TYPE_DROPDOWN || []).map((type) => [type.style, { label: type.label, className: type.className }])
     );
     if (!choices.has(blockType)) {
       blockType = Array.from(choices.keys())[0];
@@ -173,7 +227,7 @@ export default class EditorToolbar extends Component {
   }
 
   _renderInlineStyleButtons(name: string, toolbarConfig: ToolbarConfig) {
-    let {editorState} = this.props;
+    let { editorState } = this.props;
     let currentStyle = editorState.getCurrentInlineStyle();
     let buttons = (toolbarConfig.INLINE_STYLE_BUTTONS || []).map((type, index) => (
       <StyleButton
@@ -192,7 +246,7 @@ export default class EditorToolbar extends Component {
   }
 
   _renderLinkButtons(name: string, toolbarConfig: ToolbarConfig) {
-    let {editorState} = this.props;
+    let { editorState } = this.props;
     let selection = editorState.getSelection();
     let entity = this._getEntityAtCursor();
     let hasSelection = !selection.isCollapsed();
@@ -242,7 +296,7 @@ export default class EditorToolbar extends Component {
   }
 
   _renderUndoRedo(name: string, toolbarConfig: ToolbarConfig) {
-    let {editorState} = this.props;
+    let { editorState } = this.props;
     let canUndo = editorState.getUndoStack().size !== 0;
     let canRedo = editorState.getRedoStack().size !== 0;
     return (
@@ -267,12 +321,43 @@ export default class EditorToolbar extends Component {
     );
   }
 
+  _renderSpecialCharactersToolbar() {
+    return DefaultToolbarConfig.SPECIAL_CHARACTERS_BUTTONS.map((characterObject) => {
+      const { label } = characterObject;
+      return (
+        <button onClick={() => this._addSpecialCharacter(label)} key={label}>
+          {label}
+        </button>);
+    });
+  }
+
+  // _insertAtCursor(inputValue) {
+  //   const inputEl = this.inputEl || { selectionStart: 0, selectionEnd: 0, value: '' };
+  //   const value = get(inputEl, 'value', '');
+  //   const startPos = get(inputEl, 'selectionStart', 0);
+  //   const endPos = get(inputEl, 'selectionEnd', 0);
+  //   const newValue =
+  //     value.substring(0, startPos) + inputValue + value.substring(endPos, value.length);
+  //   const text = convertDisplayText(newValue);
+  // }
+
+  _addSpecialCharacter = (label) => {
+    let { editorState } = this.props;
+    let contentState = editorState.getCurrentContent();
+    let selection = editorState.getSelection();
+    let newContentState = Modifier.insertText(contentState, selection, label);
+    this.props.onChange(
+      EditorState.push(editorState, newContentState)
+    );
+    this._focusEditor();
+  }
+
   _onKeypress(event: Object, eventFlags: Object) {
     // Catch cmd+k for use with link insertion.
     if (hasCommandModifier(event) && event.keyCode === 75) {
-      let {editorState} = this.props;
+      let { editorState } = this.props;
       if (!editorState.getSelection().isCollapsed()) {
-        this.setState({showLinkInput: true});
+        this.setState({ showLinkInput: true });
         eventFlags.wasHandled = true;
       }
     }
@@ -286,7 +371,7 @@ export default class EditorToolbar extends Component {
       if (event && event.type === 'click') {
         // TODO: Use a better way to get the editor root node.
         let editorRoot = ReactDOM.findDOMNode(this).parentNode;
-        let {activeElement} = document;
+        let { activeElement } = document;
         let wasClickAway = (activeElement == null || activeElement === document.body);
         if (!wasClickAway && !editorRoot.contains(activeElement)) {
           shouldFocusEditor = false;
@@ -296,7 +381,7 @@ export default class EditorToolbar extends Component {
         this.props.focusEditor();
       }
     }
-    this.setState({showLinkInput: !isShowing});
+    this.setState({ showLinkInput: !isShowing });
   }
 
   _toggleShowImageInput(event: ?Object) {
@@ -307,7 +392,7 @@ export default class EditorToolbar extends Component {
       if (event && event.type === 'click') {
         // TODO: Use a better way to get the editor root node.
         let editorRoot = ReactDOM.findDOMNode(this).parentNode;
-        let {activeElement} = document;
+        let { activeElement } = document;
         let wasClickAway = (activeElement == null || activeElement === document.body);
         if (!wasClickAway && !editorRoot.contains(activeElement)) {
           shouldFocusEditor = false;
@@ -317,17 +402,17 @@ export default class EditorToolbar extends Component {
         this.props.focusEditor();
       }
     }
-    this.setState({showImageInput: !isShowing});
+    this.setState({ showImageInput: !isShowing });
   }
 
   _setImage(src: string) {
-    let {editorState} = this.props;
+    let { editorState } = this.props;
     let contentState = editorState.getCurrentContent();
     let selection = editorState.getSelection();
-    contentState = contentState.createEntity(ENTITY_TYPE.IMAGE, 'IMMUTABLE', {src});
+    contentState = contentState.createEntity(ENTITY_TYPE.IMAGE, 'IMMUTABLE', { src });
     let entityKey = contentState.getLastCreatedEntityKey();
     let newContentState = Modifier.insertText(contentState, selection, ' ', null, entityKey);
-    this.setState({showImageInput: false});
+    this.setState({ showImageInput: false });
     this.props.onChange(
       EditorState.push(editorState, newContentState)
     );
@@ -335,7 +420,7 @@ export default class EditorToolbar extends Component {
   }
 
   _setLink(data) {
-    let {editorState} = this.props;
+    let { editorState } = this.props;
     let contentState = editorState.getCurrentContent();
     let selection = editorState.getSelection();
     let origSelection = selection;
@@ -355,7 +440,7 @@ export default class EditorToolbar extends Component {
       canApplyLink = true;
     }
 
-    this.setState({showLinkInput: false});
+    this.setState({ showLinkInput: false });
     if (canApplyLink) {
       contentState = contentState.createEntity(ENTITY_TYPE.LINK, 'MUTABLE', data);
       let entityKey = contentState.getLastCreatedEntityKey();
@@ -370,10 +455,10 @@ export default class EditorToolbar extends Component {
   }
 
   _removeLink() {
-    let {editorState, removeLink} = this.props;
+    let { editorState, removeLink } = this.props;
     let entity = getEntityAtCursor(editorState);
     if (entity != null) {
-      let {blockKey, entityKey, startOffset, endOffset} = entity;
+      let { blockKey, entityKey, startOffset, endOffset } = entity;
 
       const content = editorState.getCurrentContent();
       const contentEntity = content ? content.getEntity(entityKey) : null;
@@ -388,19 +473,19 @@ export default class EditorToolbar extends Component {
   }
 
   _getEntityDescriptionAtCursor(): ?EntityDescription {
-    let {editorState} = this.props;
+    let { editorState } = this.props;
     return getEntityAtCursor(editorState);
   }
 
   _getEntityAtCursor(): ?Entity {
-    let {editorState} = this.props;
+    let { editorState } = this.props;
     let contentState = editorState.getCurrentContent();
     let entity = getEntityAtCursor(editorState);
     return (entity == null) ? null : contentState.getEntity(entity.entityKey);
   }
 
   _getCurrentBlockType(): string {
-    let {editorState} = this.props;
+    let { editorState } = this.props;
     let selection = editorState.getSelection();
     return editorState
       .getCurrentContent()
@@ -432,14 +517,14 @@ export default class EditorToolbar extends Component {
   }
 
   _undo() {
-    let {editorState} = this.props;
+    let { editorState } = this.props;
     this.props.onChange(
       EditorState.undo(editorState)
     );
   }
 
   _redo() {
-    let {editorState} = this.props;
+    let { editorState } = this.props;
     this.props.onChange(
       EditorState.redo(editorState)
     );
