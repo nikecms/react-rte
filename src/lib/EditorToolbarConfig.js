@@ -75,23 +75,6 @@ export const SPECIAL_CHARACTERS_BUTTONS: any = [
     unicode: '\u21AB',
     htmlEntity: '​​​​&#8203;',
   },
-  {
-    description:
-      'Insert blank area to separate words, sentences, syllables and other written or printed glpyhs',
-    icon: '\u25AA',
-    label: '\u25AA',
-    title: 'Space',
-    style: 'space',
-    unicode: ' ',
-  },
-  {
-    description: 'Remove existing character',
-    icon: '⊘',
-    label: '⊘',
-    title: 'Remove',
-    style: 'remove',
-    unicode: '',
-  },
 ];
 
 let EditorToolbarConfig: ToolbarConfig = {

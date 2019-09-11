@@ -1,10 +1,8 @@
 /* @flow */
 import { hasCommandModifier } from 'draft-js/lib/KeyBindingUtil';
 import React, { Component } from 'react';
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import ReactDOM from 'react-dom';
-import { EditorState, Entity, EntityDescription, RichUtils, Modifier, convertToRaw } from 'draft-js';
+import { EditorState, Entity, EntityDescription, RichUtils, Modifier } from 'draft-js';
 import { ENTITY_TYPE } from 'draft-js-utils';
 import DefaultToolbarConfig from './EditorToolbarConfig';
 import StyleButton from './StyleButton';
@@ -55,7 +53,6 @@ export default class EditorToolbar extends Component {
       showLinkInput: false,
       showImageInput: false,
       customControlState: {},
-      isSpecialCharactersToolbarOpen: false,
     };
   }
 
@@ -71,7 +68,6 @@ export default class EditorToolbar extends Component {
 
   render() {
     let { className, toolbarConfig, rootStyle } = this.props;
-    const { isSpecialCharactersToolbarOpen } = this.state;
     if (toolbarConfig == null) {
       toolbarConfig = DefaultToolbarConfig;
     }
@@ -97,7 +93,7 @@ export default class EditorToolbar extends Component {
           return this._renderUndoRedo(groupName, toolbarConfig);
         }
         case 'SPECIAL_CHARACTERS_BUTTONS': {
-          return this._renderSpecialCharactersToggle(groupName, toolbarConfig);
+          return this._renderSpecialCharactersToolbar(groupName, toolbarConfig);
         }
         default:
           break;
@@ -107,7 +103,6 @@ export default class EditorToolbar extends Component {
     return (
       <div className={cx(styles.root, className)} style={rootStyle}>
         {buttonGroups}
-        {isSpecialCharactersToolbarOpen && this._renderSpecialCharactersToolbar()}
         {this._renderCustomControls()}
       </div>
     );
@@ -142,50 +137,6 @@ export default class EditorToolbar extends Component {
 
   _getCustomControlState(key: string) {
     return this.state.customControlState[key];
-  }
-
-  // ▪︎ u25AA
-  // ⎵ u23B5
-  // ⊘ u2298
-  // ↫ u21AB
-  // ↲ u21B2
-  convertDisplayText = text =>
-    text
-      .replace(/⎵/g, '\&nbsp;')
-      .replace(/↲/g, '\&#8232;')
-      .replace(/↫/g, '\&#8203;')
-      .replace(/\s/g, '\u25AA');
-
-  // const convertDisplayText = displayText =>
-  //   displayText
-  //     .replace(/\u23B5/g, '\u00A0') // ⎵ u23B5 > u00A0 Non-Breaking Space
-  //     .replace(/\u21AB/g, '\u200B') // ↫ u21AB > u200B Zero-Width Space
-  //     .replace(/\u21B2/g, '\u000A') // ↲ u21B2 > u000A New Line (end of line)
-  //     .replace(/\u25AA/g, ' '); // ▪︎ u25AA > space
-
-  _toggleSpecialCharactersToolbar = () => {
-    const isOpen = this.state.isSpecialCharactersToolbarOpen;
-    this.setState({ isSpecialCharactersToolbarOpen: !isOpen });
-    let { editorState, value } = this.props;
-    let contentState = editorState.getCurrentContent();
-    let selection = editorState.getSelection();
-    console.log({ value, text: contentState.getBlo`ckMap() });
-    if (contenState.hasText() && isOpen) {
-      let newContentState = Modifier.replaceText(contentState, selection, this.convertDisplayText(value.toString('html')));
-      this.props.onChange(
-        EditorState.push(editorState, newContentState)
-      );
-      this._focusEditor();
-    } else {
-      let newContentState = Modifier.insertText(contentState, selection)
-    }
-  }
-
-  _renderSpecialCharactersToggle = () => {
-    return (
-      <ToggleButton key={1} value="left" onChange={this._toggleSpecialCharactersToolbar}>
-        TLC
-      </ToggleButton>);
   }
 
   _renderBlockTypeDropdown(name: string, toolbarConfig: ToolbarConfig) {
@@ -223,6 +174,26 @@ export default class EditorToolbar extends Component {
     ));
     return (
       <ButtonGroup key={name}>{buttons}</ButtonGroup>
+    );
+  }
+
+  _renderSpecialCharactersToolbar(name: string, toolbarConfig: ToolbarConfig) {
+    let buttons = (DefaultToolbarConfig.SPECIAL_CHARACTERS_BUTTONS || []).map(({ label }) => (
+      <button
+        key={label}
+        label={label}
+        className={styles['tlc-icon']}
+        onClick={() => this._addSpecialCharacter(label)}
+      >
+        {label}
+      </button>
+    ));
+    return (
+      <ButtonGroup key={name}>
+        <div className={styles['tlc-container']}>
+          {buttons}
+        </div>
+      </ButtonGroup>
     );
   }
 
@@ -320,26 +291,6 @@ export default class EditorToolbar extends Component {
       </ButtonGroup>
     );
   }
-
-  _renderSpecialCharactersToolbar() {
-    return DefaultToolbarConfig.SPECIAL_CHARACTERS_BUTTONS.map((characterObject) => {
-      const { label } = characterObject;
-      return (
-        <button onClick={() => this._addSpecialCharacter(label)} key={label}>
-          {label}
-        </button>);
-    });
-  }
-
-  // _insertAtCursor(inputValue) {
-  //   const inputEl = this.inputEl || { selectionStart: 0, selectionEnd: 0, value: '' };
-  //   const value = get(inputEl, 'value', '');
-  //   const startPos = get(inputEl, 'selectionStart', 0);
-  //   const endPos = get(inputEl, 'selectionEnd', 0);
-  //   const newValue =
-  //     value.substring(0, startPos) + inputValue + value.substring(endPos, value.length);
-  //   const text = convertDisplayText(newValue);
-  // }
 
   _addSpecialCharacter = (label) => {
     let { editorState } = this.props;
