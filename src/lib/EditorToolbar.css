@@ -9,3 +9,22 @@
   -ms-user-select: none;
   user-select: none;
 }
+
+.tlc-icon {
+  background: linear-gradient(to bottom, #fdfdfd 0%,#f6f7f8 100%);
+  width: 30px;
+  border: none;
+  border-right: 1px solid #999;
+  border-radius: 0px !important;
+  font-weight: bold;
+  font-size: large;
+}
+
+.tlc-container {
+  display: flex;
+  flex-direction: row;
+  height: 28px;
+  border: 1px solid #999;
+  border-radius: 2px;
+  border-right: none;
+}

@@ -10,6 +10,43 @@ import IconButton from './ui/IconButton';
 
 import type {EditorValue} from './RichTextEditor';
 
+
+const toolbarConfig = {
+  display: ['INLINE_STYLE_BUTTONS', 'SPECIAL_CHARACTERS_BUTTONS', 'BLOCK_TYPE_BUTTONS', 'LINK_BUTTONS'],
+  INLINE_STYLE_BUTTONS: [
+    {label: 'Bold', style: 'BOLD', className: 'custom-css-class'},
+    {label: 'Italic', style: 'ITALIC'},
+    {label: 'Underline', style: 'UNDERLINE'},
+  ],
+  BLOCK_TYPE_BUTTONS: [
+    {label: 'UL', style: 'unordered-list-item'},
+    {label: 'OL', style: 'ordered-list-item'},
+  ],
+  SPECIAL_CHARACTERS_BUTTONS: [
+    {
+      description: 'Keep words on the same line',
+      label: '⎵',
+      style: 'non-breaking-space',
+      unicode: '\u23B5',
+      htmlEntity: '&nbsp;',
+    },
+    {
+      description: 'End line here and begin another',
+      label: '↲',
+      style: 'line-separator',
+      unicode: '\u21B2',
+      htmlEntity: '&#8232;',
+    },
+    {
+      description: 'Insert opportunity for line break on overflow text',
+      label: '↫',
+      style: 'zero-width-space',
+      unicode: '\u21AB',
+      htmlEntity: '​​​​&#8203;',
+    },
+  ],
+};
+
 type Props = {};
 type State = {
   value: EditorValue;
@@ -46,6 +83,7 @@ export default class EditorDemo extends Component {
             className="react-rte-demo"
             placeholder="Tell a story"
             toolbarClassName="demo-toolbar"
+            toolbarConfig={toolbarConfig}
             editorClassName="demo-editor"
             readOnly={this.state.readOnly}
             customControls={[

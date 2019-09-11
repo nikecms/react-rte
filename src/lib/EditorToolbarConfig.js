@@ -15,7 +15,7 @@ export type CustomControlList = Array<CustomControl>;
 
 export type StyleConfigList = Array<StyleConfig>;
 
-export type GroupName = 'INLINE_STYLE_BUTTONS' | 'BLOCK_TYPE_BUTTONS' | 'LINK_BUTTONS' | 'BLOCK_TYPE_DROPDOWN' | 'HISTORY_BUTTONS' | 'IMAGE_BUTTON';
+export type GroupName = 'INLINE_STYLE_BUTTONS' | 'BLOCK_TYPE_BUTTONS' | 'LINK_BUTTONS' | 'BLOCK_TYPE_DROPDOWN' | 'HISTORY_BUTTONS' | 'IMAGE_BUTTON' | 'SPECIAL_CHARACTERS_BUTTONS';
 
 export type ToolbarConfig = {
   display: Array<GroupName>;
@@ -23,6 +23,7 @@ export type ToolbarConfig = {
   INLINE_STYLE_BUTTONS: StyleConfigList;
   BLOCK_TYPE_DROPDOWN: StyleConfigList;
   BLOCK_TYPE_BUTTONS: StyleConfigList;
+  SPECIAL_CHARACTERS_BUTTONS: StyleConfigList;
 };
 
 export const INLINE_STYLE_BUTTONS: StyleConfigList = [
@@ -46,11 +47,42 @@ export const BLOCK_TYPE_BUTTONS: StyleConfigList = [
   {label: 'Blockquote', style: 'blockquote'},
 ];
 
+export const SPECIAL_CHARACTERS_BUTTONS: any = [
+  {
+    description: 'Keep words on the same line',
+    icon: '⎵',
+    label: '⎵',
+    title: 'Non-Breaking Space',
+    style: 'non-breaking-space',
+    unicode: '\u23B5',
+    htmlEntity: '&nbsp;',
+  },
+  {
+    description: 'End line here and begin another',
+    icon: '↲',
+    label: '↲',
+    title: 'Line Separator',
+    style: 'line-separator',
+    unicode: '\u21B2',
+    htmlEntity: '&#8232;',
+  },
+  {
+    description: 'Insert opportunity for line break on overflow text',
+    icon: '↫',
+    label: '↫',
+    title: 'Zero-Width Space',
+    style: 'zero-width-space',
+    unicode: '\u21AB',
+    htmlEntity: '​​​​&#8203;',
+  },
+];
+
 let EditorToolbarConfig: ToolbarConfig = {
-  display: ['INLINE_STYLE_BUTTONS', 'BLOCK_TYPE_BUTTONS', 'LINK_BUTTONS', 'IMAGE_BUTTON', 'BLOCK_TYPE_DROPDOWN', 'HISTORY_BUTTONS'],
+  display: ['INLINE_STYLE_BUTTONS', 'BLOCK_TYPE_BUTTONS', 'LINK_BUTTONS', 'IMAGE_BUTTON', 'BLOCK_TYPE_DROPDOWN', 'HISTORY_BUTTONS', 'SPECIAL_CHARACTERS_BUTTONS'],
   INLINE_STYLE_BUTTONS,
   BLOCK_TYPE_DROPDOWN,
   BLOCK_TYPE_BUTTONS,
+  SPECIAL_CHARACTERS_BUTTONS,
 };
 
 export default EditorToolbarConfig;
