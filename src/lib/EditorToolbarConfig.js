@@ -58,7 +58,7 @@ export const SPECIAL_CHARACTERS_BUTTONS: any = [
   },
   {
     description: 'End line here and begin another',
-    icon: '↲',
+    icon: '↵',
     label: 'Line Separator',
     style: 'line-separator',
     unicode: '\u21B2',

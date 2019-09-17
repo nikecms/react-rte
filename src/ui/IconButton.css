@@ -99,14 +99,17 @@
 .icon-non-breaking-space:after {
   content: "⎵";
   font-weight: bold;
+  font-size: initial;
 }
 
 .icon-line-separator:after {
-  content: "↲";
+  content: "↵";
   font-weight: bold;
+  font-family: initial;
 }
 
 .icon-zero-width-space:after {
   content: "↤";
   font-weight: bold;
+  font-size: initial;
 }
