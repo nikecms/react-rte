@@ -10,7 +10,7 @@ import IconButton from './ui/IconButton';
 
 import type {EditorValue} from './RichTextEditor';
 
-
+//  toolbar settings
 const toolbarConfig = {
   display: ['INLINE_STYLE_BUTTONS', 'SPECIAL_CHARACTERS_BUTTONS', 'BLOCK_TYPE_BUTTONS', 'LINK_BUTTONS'],
   INLINE_STYLE_BUTTONS: [
