@@ -98,18 +98,16 @@
 
 .icon-non-breaking-space:after {
   content: "⎵";
-  font-weight: bold;
-  font-size: initial;
+  font-size: large;
 }
 
 .icon-line-separator:after {
-  content: "↵";
+  content: "↲";
   font-weight: bold;
-  font-family: initial;
+  font-size: large;
 }
 
 .icon-zero-width-space:after {
   content: "↤";
-  font-weight: bold;
-  font-size: initial;
+  font-size: large;
 }
