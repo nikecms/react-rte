@@ -51,8 +51,7 @@ export const SPECIAL_CHARACTERS_BUTTONS: any = [
   {
     description: 'Keep words on the same line',
     icon: '⎵',
-    label: '⎵',
-    title: 'Non-Breaking Space',
+    label: 'Non-Breaking Space',
     style: 'non-breaking-space',
     unicode: '\u23B5',
     htmlEntity: '&nbsp;',
@@ -60,8 +59,7 @@ export const SPECIAL_CHARACTERS_BUTTONS: any = [
   {
     description: 'End line here and begin another',
     icon: '↲',
-    label: '↲',
-    title: 'Line Separator',
+    label: 'Line Separator',
     style: 'line-separator',
     unicode: '\u21B2',
     htmlEntity: '&#8232;',
@@ -69,8 +67,7 @@ export const SPECIAL_CHARACTERS_BUTTONS: any = [
   {
     description: 'Insert opportunity for line break on overflow text',
     icon: '↫',
-    label: '↫',
-    title: 'Zero-Width Space',
+    label: 'Zero-Width Space',
     style: 'zero-width-space',
     unicode: '\u21AB',
     htmlEntity: '​​​​&#8203;',

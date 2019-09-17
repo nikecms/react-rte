@@ -178,21 +178,17 @@ export default class EditorToolbar extends Component {
   }
 
   _renderSpecialCharactersToolbar(name: string, toolbarConfig: ToolbarConfig) {
-    let buttons = (DefaultToolbarConfig.SPECIAL_CHARACTERS_BUTTONS || []).map(({ label }) => (
-      <button
-        key={label}
+    let buttons = (DefaultToolbarConfig.SPECIAL_CHARACTERS_BUTTONS || []).map(({ icon, label, style }) => (
+      <IconButton
+        key={style}
         label={label}
-        className={styles['tlc-icon']}
-        onClick={() => this._addSpecialCharacter(label)}
-      >
-        {label}
-      </button>
+        iconName={style}
+        onClick={() => this._addSpecialCharacter(icon)}
+      />
     ));
     return (
       <ButtonGroup key={name}>
-        <div className={styles['tlc-container']}>
           {buttons}
-        </div>
       </ButtonGroup>
     );
   }
@@ -292,11 +288,11 @@ export default class EditorToolbar extends Component {
     );
   }
 
-  _addSpecialCharacter = (label) => {
+  _addSpecialCharacter = icon => {
     let { editorState } = this.props;
     let contentState = editorState.getCurrentContent();
     let selection = editorState.getSelection();
-    let newContentState = Modifier.insertText(contentState, selection, label);
+    let newContentState = Modifier.insertText(contentState, selection, icon);
     this.props.onChange(
       EditorState.push(editorState, newContentState)
     );
