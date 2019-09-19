@@ -66,10 +66,10 @@ export const SPECIAL_CHARACTERS_BUTTONS: any = [
   },
   {
     description: 'Insert opportunity for line break on overflow text',
-    icon: '↤',
+    icon: '↫',
     label: 'Zero-Width Space',
     style: 'zero-width-space',
-    unicode: '\u21A4',
+    unicode: '\u21AB',
     htmlEntity: '​​​​&#8203;',
   },
 ];
