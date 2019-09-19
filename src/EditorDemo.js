@@ -39,7 +39,7 @@ const toolbarConfig = {
     },
     {
       description: 'Insert opportunity for line break on overflow text',
-      label: '↤',
+      label: '↫',
       style: 'zero-width-space',
       unicode: '\u21AB',
       htmlEntity: '​​​​&#8203;',
